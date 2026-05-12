@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\BillingController;
 use App\Services\PlanLimitService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -34,14 +35,8 @@ Route::prefix('v1')->group(function (): void {
         ];
     });
 
-    Route::post('/stripe/webhook', function (Request $request): array {
-        return [
-            'success' => true,
-            'data' => ['received' => true, 'type' => $request->input('type')],
-            'error' => null,
-            'meta' => ['timestamp' => now()->toISOString()],
-        ];
-    });
+    Route::post('/organizations/{organization}/billing/checkout', [BillingController::class, 'checkout']);
+    Route::post('/stripe/webhook', [BillingController::class, 'webhook']);
 
     Route::get('/events/tasks', function (): StreamedResponse {
         return response()->stream(function (): void {
