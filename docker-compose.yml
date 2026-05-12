@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: saas_task_manager
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5434:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6381:6379"

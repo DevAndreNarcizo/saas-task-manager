@@ -1,0 +1,14 @@
+{
+  "name": "saas-task-manager",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev:web": "npm run dev --workspace apps/web",
+    "build:web": "npm run build --workspace apps/web",
+    "test:api": "cd apps/api && php artisan test",
+    "lint:api": "cd apps/api && ./vendor/bin/pint --test"
+  },
+  "workspaces": [
+    "apps/web"
+  ]
+}
