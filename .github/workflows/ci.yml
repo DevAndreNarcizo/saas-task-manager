@@ -21,4 +21,5 @@ jobs:
       - run: npm run build:web
       - run: cd apps/api && composer install --no-interaction --prefer-dist
       - run: cd apps/api && cp .env.example .env && php artisan key:generate
+      - run: cd apps/api && touch database/database.sqlite
       - run: npm run test:api
