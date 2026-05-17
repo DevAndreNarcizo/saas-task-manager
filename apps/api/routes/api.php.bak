@@ -33,9 +33,9 @@ Route::prefix('v1')->group(function (): void {
             'error' => null,
             'meta' => ['timestamp' => now()->toISOString()],
         ];
-    })->middleware('auth:sanctum');
+    });
 
-    Route::post('/organizations/{organization}/billing/checkout', [BillingController::class, 'checkout'])->middleware('auth:sanctum');
+    Route::post('/organizations/{organization}/billing/checkout', [BillingController::class, 'checkout']);
     Route::post('/stripe/webhook', [BillingController::class, 'webhook']);
 
     Route::get('/events/tasks', function (): StreamedResponse {
@@ -47,5 +47,5 @@ Route::prefix('v1')->group(function (): void {
             'Content-Type' => 'text/event-stream',
             'Cache-Control' => 'no-cache',
         ]);
-    })->middleware('auth:sanctum');
+    });
 });

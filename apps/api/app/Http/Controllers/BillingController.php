@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Services\StripeBillingService;
+use App\Services\StripeWebhookHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Stripe\Exception\SignatureVerificationException;
@@ -12,7 +13,10 @@ use UnexpectedValueException;
 
 final class BillingController extends Controller
 {
-    public function __construct(private readonly StripeBillingService $billing) {}
+    public function __construct(
+        private readonly StripeBillingService $billing,
+        private readonly StripeWebhookHandler $webhookHandler,
+    ) {}
 
     /**
      * Inicia checkout Stripe para upgrade de organização.
@@ -43,7 +47,7 @@ final class BillingController extends Controller
     public function webhook(Request $request): JsonResponse
     {
         try {
-            $type = $this->billing->handleWebhook(
+            $type = $this->webhookHandler->handle(
                 payload: $request->getContent(),
                 signature: (string) $request->header('Stripe-Signature'),
             );

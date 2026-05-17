@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\DB;
 use Stripe\Checkout\Session;
 use Stripe\Stripe;
-use Stripe\Webhook;
-use UnexpectedValueException;
 
 final class StripeBillingService
 {
@@ -38,44 +35,5 @@ final class StripeBillingService
                 'organization_id' => (string) $organizationId,
             ],
         ]);
-    }
-
-    /**
-     * Valida assinatura do Stripe e sincroniza assinatura local.
-     *
-     * @author André Narcizo
-     */
-    public function handleWebhook(string $payload, string $signature): string
-    {
-        $event = Webhook::constructEvent(
-            $payload,
-            $signature,
-            (string) config('services.stripe.webhook_secret'),
-        );
-
-        $type = $event->type;
-        $object = $event->data->object;
-
-        if ($type === 'checkout.session.completed' && isset($object->metadata->organization_id)) {
-            DB::table('organizations')->where('id', (int) $object->metadata->organization_id)->update([
-                'plan' => 'pro',
-                'stripe_customer_id' => $object->customer,
-                'stripe_subscription_id' => $object->subscription,
-                'updated_at' => now(),
-            ]);
-        }
-
-        if (in_array($type, ['customer.subscription.deleted', 'customer.subscription.paused'], true) && isset($object->id)) {
-            DB::table('organizations')->where('stripe_subscription_id', (string) $object->id)->update([
-                'plan' => 'free',
-                'updated_at' => now(),
-            ]);
-        }
-
-        if (! is_string($type) || $type === '') {
-            throw new UnexpectedValueException('Invalid Stripe event type.');
-        }
-
-        return $type;
     }
 }
